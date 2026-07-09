@@ -365,7 +365,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 📞 Support
 
-For support, email your-email@example.com or open an issue on GitHub.
+For support, email tyabolaji@gmail.com or open an issue on GitHub.
 🗺️ Roadmap
 
     Batch file conversion
@@ -373,18 +373,6 @@ For support, email your-email@example.com or open an issue on GitHub.
     Audio quality selection
 
     Progress tracking with WebSockets
-
-    User authentication
-
-    Cloud storage integration (S3, Google Drive)
-
-    Mobile-responsive improvements
-
-    Dark mode
-
-    More video formats support
-
-    Video trimming before conversion
 
     Audio preview before download
 
@@ -398,14 +386,10 @@ For support, email your-email@example.com or open an issue on GitHub.
 
     API Response Time: < 100ms
 
-Built with ❤️ using React, FastAPI, and MoviePy
+Built using React, FastAPI, and MoviePy
 text
 
 
-## Additional Files to Consider
-
-### Create a `CONTRIBUTING.md` file:
-```markdown
 # Contributing to MP4 to MP3 Converter
 
 We love your input! We want to make contributing to this project as easy and transparent as possible.
