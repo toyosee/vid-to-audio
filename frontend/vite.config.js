@@ -8,7 +8,7 @@ export default defineConfig({
     server: {
     proxy: {
       '/api': {
-        target: 'https://vid-to-audio-production.up.railway.app/',
+        target: 'https://vid-to-audio-production.up.railway.app',
         changeOrigin: true,
       },
     },
