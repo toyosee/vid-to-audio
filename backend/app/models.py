@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from typing import Optional
+
 
 class ConversionResponse(BaseModel):
     success: bool

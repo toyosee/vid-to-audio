@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { convertVideo, downloadFile } from './api/client';
+import { convertVideo, convertFromURL, downloadFile } from './api/client';
 import FileUpload from './components/FileUpload';
+import URLInput from './components/URLInput';
 import ConversionProgress from './components/ConversionProgress';
 import DownloadButton from './components/DownloadButton';
-import { FiMusic, FiVideo } from 'react-icons/fi';
+import Footer from './components/Footer';
+import { FiMusic, FiVideo, FiLink, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 
 function App() {
   const [file, setFile] = useState(null);
@@ -11,8 +13,7 @@ function App() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [conversionResult, setConversionResult] = useState(null);
-
-  const developer = "Elijah Abolaji"; 
+  const [mode, setMode] = useState('upload'); // 'upload' or 'url'
 
   const handleFileAccepted = (acceptedFile) => {
     setFile(acceptedFile);
@@ -51,12 +52,38 @@ function App() {
     }
   };
 
+  const handleURLSubmit = async (url) => {
+    setStatus('uploading');
+    setProgress(10);
+    setError(null);
+
+    try {
+      setProgress(30);
+      setStatus('converting');
+      
+      const result = await convertFromURL(url);
+      
+      setProgress(100);
+      setStatus('complete');
+      setConversionResult(result);
+    } catch (err) {
+      setStatus('error');
+      setError(err.error || 'Failed to extract audio from URL.');
+      setProgress(0);
+    }
+  };
+
   const handleReset = () => {
     setFile(null);
     setStatus(null);
     setProgress(0);
     setError(null);
     setConversionResult(null);
+  };
+
+  const toggleMode = () => {
+    setMode(mode === 'upload' ? 'url' : 'upload');
+    handleReset();
   };
 
   return (
@@ -69,36 +96,67 @@ function App() {
             <FiMusic className="w-10 h-10 text-purple-600" />
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Free Video To MP3 Converter
+            Vid2Audio Converter
           </h1>
           <p className="text-lg text-gray-600">
-            Extract audio from your videos instantly
+            Extract audio from videos or online URLs
           </p>
+        </div>
+
+        {/* Mode Toggle */}
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={toggleMode}
+            className="flex items-center gap-3 px-6 py-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+          >
+            <span className={`font-medium ${mode === 'upload' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <FiVideo className="inline mr-1" /> Upload
+            </span>
+            {mode === 'upload' ? 
+              <FiToggleLeft className="w-6 h-6 text-blue-600" /> : 
+              <FiToggleRight className="w-6 h-6 text-blue-600" />
+            }
+            <span className={`font-medium ${mode === 'url' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <FiLink className="inline mr-1" /> URL
+            </span>
+          </button>
         </div>
 
         {/* Main Content */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* File Upload */}
-          <FileUpload 
-            onFileAccepted={handleFileAccepted}
-            file={file}
-            onRemove={handleRemoveFile}
-          />
+          {mode === 'upload' ? (
+            <>
+              {/* File Upload */}
+              <FileUpload 
+                onFileAccepted={handleFileAccepted}
+                file={file}
+                onRemove={handleRemoveFile}
+              />
 
-          {/* Convert Button */}
-          {file && !conversionResult && (
-            <div className="text-center mt-6">
-              <button
-                onClick={handleConvert}
-                disabled={status === 'uploading' || status === 'converting'}
-                className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {status === 'uploading' || status === 'converting' 
-                  ? 'Converting...' 
-                  : 'Convert to MP3'
-                }
-              </button>
-            </div>
+              {/* Convert Button */}
+              {file && !conversionResult && (
+                <div className="text-center mt-6">
+                  <button
+                    onClick={handleConvert}
+                    disabled={status === 'uploading' || status === 'converting'}
+                    className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {status === 'uploading' || status === 'converting' 
+                      ? 'Converting...' 
+                      : 'Convert to MP3'
+                    }
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            /* URL Input */
+            <URLInput 
+              onSubmit={handleURLSubmit}
+              isLoading={status === 'uploading' || status === 'converting'}
+              error={error}
+              onClear={handleReset}
+            />
           )}
 
           {/* Conversion Progress */}
@@ -116,14 +174,26 @@ function App() {
               onReset={handleReset}
             />
           )}
+
+          {/* Show title if from URL */}
+          {conversionResult?.title && (
+            <div className="mt-4 text-center text-sm text-gray-600">
+              <span className="font-medium">Extracted from:</span> {conversionResult.title}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Supports MP4, AVI, MOV, MKV formats • Max file size: 100MB</p>
-          <p className="mt-1">Your files are processed securely and deleted after conversion</p>
-          <p className="mt-1"><strong>© {new Date().getFullYear()} | Developed By {developer}</strong></p>
+          <p>
+            {mode === 'upload' 
+              ? 'Supports MP4, AVI, MOV, MKV • Max file size: 100MB'
+              : 'Supports YouTube, Facebook, Vimeo, Dailymotion and more'
+            }
+          </p>
+          <p className="mt-1">Your files are processed locally and deleted after conversion</p>
         </div>
+        <Footer />
       </div>
     </div>
   );
