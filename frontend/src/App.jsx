@@ -184,15 +184,6 @@ function App() {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>
-            {mode === 'upload' 
-              ? 'Supports MP4, AVI, MOV, MKV • Max file size: 100MB'
-              : 'Supports YouTube, Facebook, Vimeo, Dailymotion and more'
-            }
-          </p>
-          <p className="mt-1">Your files are processed locally and deleted after conversion</p>
-        </div>
         <Footer />
       </div>
     </div>
